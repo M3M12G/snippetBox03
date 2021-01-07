@@ -1,9 +1,9 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"flag"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v4"
 	"log"
 	"net/http"
 	"os"
@@ -22,22 +22,24 @@ func main() {
 
 	flag.Parse()
 
-	dsn := flag.String("dsn", "user=postgres password=root dbname=snippetbox sslmode=disable", "PostgreSQL data source name")
+	ctx := context.Background()
+
+	dsn := flag.String("dsn", "postgres://postgres:root@localhost:5432/snippetbox", "PostgreSQL data source name")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	db, err := openDB(*dsn)
+	db, err := openDB(*dsn, ctx)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 
-	defer db.Close()
+	defer db.Close(ctx)
 
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
-		snippets: &postgresql.SnippetModel{DB: db},
+		snippets: &postgresql.SnippetModel{DB: db, Ctx: ctx},
 	}
 
 	srv := &http.Server{
@@ -50,13 +52,15 @@ func main() {
 	errorLog.Fatal(err)
 }
 
-func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", dsn)
+func openDB(dsn string, ctx context.Context) (*pgx.Conn, error) {
+	conn, err := pgx.Connect(ctx, dsn)
 	if err != nil {
 		return nil, err
 	}
-	if err = db.Ping(); err != nil {
+	//testing connection
+	if err = conn.Ping(ctx); err != nil {
 		return nil, err
 	}
-	return db, nil
+	//returning connection pool
+	return conn, nil
 }

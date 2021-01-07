@@ -1,35 +1,26 @@
 package postgresql
 
 import (
+	"context"
 	"database/sql"
 	"errors"
+	"github.com/jackc/pgx/v4"
 	"se03.com/pkg/models"
 	"strconv"
 	"time"
 )
 
 type SnippetModel struct {
-	DB *sql.DB
+	DB  *pgx.Conn
+	Ctx context.Context
 }
 
 // This will insert a new snippet into the database.
 func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 	stmt := "INSERT INTO snippets (title, content, created, expires) VALUES ($1, $2, $3, $4) RETURNING id"
 
-	/*//as this driver does not support lastInsertedId() method,
+	/*as this driver does not support lastInsertedId() method,
 	then we should use sql.DB.QueryRow().Scan() methods to receive that last id
-	below the code from the book
-	result, err := m.DB.Exec(stmt, title, content, expires)
-	if err != nil{
-		return 0, nil
-	}
-
-	id, err := result.LastInsertId()
-	if err != nil{
-		return 0, err
-	}
-
-	return int(id), nil
 	*/
 
 	//может быть это костыли, но она работает
@@ -38,7 +29,7 @@ func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 	expiresAt := created.AddDate(0, 0, day)
 
 	id := 0
-	err := m.DB.QueryRow(stmt, title, content, created, expiresAt).Scan(&id)
+	err := m.DB.QueryRow(m.Ctx, stmt, title, content, created, expiresAt).Scan(&id)
 	if err != nil {
 		panic(err)
 	}
@@ -48,7 +39,8 @@ func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 // This will return a specific snippet based on its id.
 func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
 	s := &models.Snippet{}
-	err := m.DB.QueryRow("SELECT id, title, content, created, expires FROM snippets WHERE expires > NOW() AND id = $1", id).Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+	err := m.DB.QueryRow(m.Ctx, "SELECT id, title, content, created, expires FROM snippets "+
+		"WHERE expires > NOW() AND id = $1", id).Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, models.ErrNoRecord
@@ -61,5 +53,32 @@ func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
 
 // This will return the 10 most recently created snippets.
 func (m *SnippetModel) Latest() ([]*models.Snippet, error) {
-	return nil, nil
+	stmt := "SELECT id, title, content, created, expires FROM snippets " +
+		"WHERE expires > NOW() ORDER BY created DESC LIMIT 10"
+
+	rows, err := m.DB.Query(m.Ctx, stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	snippets := []*models.Snippet{}
+
+	for rows.Next() {
+		s := &models.Snippet{}
+		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+
+		if err != nil {
+			return nil, err
+		}
+
+		snippets = append(snippets, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return snippets, nil
 }
