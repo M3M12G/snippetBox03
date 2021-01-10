@@ -2,17 +2,14 @@ package postgresql
 
 import (
 	"context"
-	"database/sql"
-	"errors"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"se03.com/pkg/models"
 	"strconv"
 	"time"
 )
 
 type SnippetModel struct {
-	DB  *pgx.Conn
-	Ctx context.Context
+	DB *pgxpool.Pool
 }
 
 // This will insert a new snippet into the database.
@@ -29,7 +26,7 @@ func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 	expiresAt := created.AddDate(0, 0, day)
 
 	id := 0
-	err := m.DB.QueryRow(m.Ctx, stmt, title, content, created, expiresAt).Scan(&id)
+	err := m.DB.QueryRow(context.Background(), stmt, title, content, created, expiresAt).Scan(&id)
 	if err != nil {
 		panic(err)
 	}
@@ -39,10 +36,11 @@ func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 // This will return a specific snippet based on its id.
 func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
 	s := &models.Snippet{}
-	err := m.DB.QueryRow(m.Ctx, "SELECT id, title, content, created, expires FROM snippets "+
+	err := m.DB.QueryRow(context.Background(), "SELECT id, title, content, created, expires FROM snippets "+
 		"WHERE expires > NOW() AND id = $1", id).Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if err.Error() == "no rows in result set" {
 			return nil, models.ErrNoRecord
 		} else {
 			return nil, err
@@ -56,7 +54,7 @@ func (m *SnippetModel) Latest() ([]*models.Snippet, error) {
 	stmt := "SELECT id, title, content, created, expires FROM snippets " +
 		"WHERE expires > NOW() ORDER BY created DESC LIMIT 10"
 
-	rows, err := m.DB.Query(m.Ctx, stmt)
+	rows, err := m.DB.Query(context.Background(), stmt)
 	if err != nil {
 		return nil, err
 	}
