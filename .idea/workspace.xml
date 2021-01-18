@@ -25,13 +25,16 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="239899f1-fc9c-4e68-b8fd-e7d13c9bbf4f" name="Default Changelist" comment="Chapter 6-7 completed">
-      <change afterPath="$PROJECT_DIR$/pkg/forms/errors.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/forms/form.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui/html/create.page.tmpl" afterDir="false" />
+    <list default="true" id="239899f1-fc9c-4e68-b8fd-e7d13c9bbf4f" name="Default Changelist" comment="Chapter 8 completed">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/web/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/web/handlers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/web/helpers.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/web/helpers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/web/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/web/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/web/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/web/routes.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/web/templates.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/web/templates.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/html/base.layout.tmpl" beforeDir="false" afterPath="$PROJECT_DIR$/ui/html/base.layout.tmpl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,7 +99,8 @@
     <MESSAGE value="using pgxpool instead just pgx" />
     <MESSAGE value="chapter 5 completed. Dynamic HTML template caching feature is added" />
     <MESSAGE value="Chapter 6-7 completed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Chapter 6-7 completed" />
+    <MESSAGE value="Chapter 8 completed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Chapter 8 completed" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -134,10 +138,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="277" y="57" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1609825842376" />
-    <state x="521" y="177" key="Vcs.Push.Dialog.v2" timestamp="1610984587450">
+    <state x="521" y="177" key="Vcs.Push.Dialog.v2" timestamp="1610987964253">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="521" y="177" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1610984587450" />
+    <state x="521" y="177" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1610987964253" />
     <state x="747" y="358" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1609778104322">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
