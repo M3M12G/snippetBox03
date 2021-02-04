@@ -1,0 +1,26 @@
+version: '3.4'
+#При запуске данного docker-compose файла, могут возникнуть ошибки типа unauthorized. Для этого, заранее авторизуйтей через
+#docker login -u "yourDockerName" -p "yourPass" docker.io
+#после выполнения данной команды попробуйте запустить docker-compose
+#даже при удачном запуске могут возникнуть ошибки, поэтому попробуйте запустить как минимум 2 раза.
+services:
+  snippetbox:
+    image: mmgd0ck3r/snippetbox_app
+    restart: always
+    environment:
+      CONNECTIONSTRING: "postgres://postgres:root@snippetboxdb:5432/snippetbox"
+    depends_on:
+      - snippetboxdb
+    ports:
+      - "4000:4000"
+  snippetboxdb:
+    image: "postgres"
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: snippetbox
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init_snippet.sql:/docker-entrypoint-initdb.d/init_snippet.sql
