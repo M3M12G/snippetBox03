@@ -3,14 +3,16 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/golangcollege/sessions"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
-	"se03.com/pkg/models/postgresql"
 	"time"
+
+	"github.com/golangcollege/sessions"
+	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/newrelic/go-agent/v3/newrelic"
+	"se03.com/pkg/models/postgresql"
 )
 
 type application struct {
@@ -19,6 +21,7 @@ type application struct {
 	session       *sessions.Session
 	snippets      *postgresql.SnippetModel
 	templateCache map[string]*template.Template
+	newrelic      *newrelic.Application
 }
 
 func main() {
@@ -45,12 +48,19 @@ func main() {
 	session := sessions.New([]byte(*secret))
 	session.Lifetime = 12 * time.Hour
 
+	newrelicApp, err := newrelic.NewApplication(
+		newrelic.ConfigAppName("m3m12g-go"),
+		newrelic.ConfigLicense("9f9b29c18528425b0aa4e4a2ea7644940329NRAL"),
+		newrelic.ConfigAppLogForwardingEnabled(true),
+	)
+
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		session:       session,
 		snippets:      &postgresql.SnippetModel{DB: db},
 		templateCache: templateCache,
+		newrelic:      newrelicApp,
 	}
 
 	srv := &http.Server{

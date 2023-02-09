@@ -5,7 +5,7 @@ version: '3.4'
 #даже при удачном запуске могут возникнуть ошибки, поэтому попробуйте запустить как минимум 2 раза.
 services:
   snippetbox:
-    image: mmgd0ck3r/snippetbox_app
+    image: mmgd0ck3r/snippetbox_newrelic
     restart: always
     environment:
       CONNECTIONSTRING: "postgres://postgres:root@snippetboxdb:5432/snippetbox"
